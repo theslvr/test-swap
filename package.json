@@ -1,12 +1,14 @@
 {
   "name": "swap-coin-app",
   "version": "0.1.0",
+  "homepage": "https://theslvr.github.io/test-swap",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy": "gh-pages -d out"
   },
   "dependencies": {
     "@radix-ui/react-select": "^2.1.6",
