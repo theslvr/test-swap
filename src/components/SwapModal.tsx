@@ -31,7 +31,6 @@ export function SwapModal() {
 
   const [tokenList, setTokenList] = useState<Token[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [slippage, setSlippage] = useState<string>('0.5');
 
   useEffect(() => {
     fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false')
@@ -143,11 +142,13 @@ export function SwapModal() {
         <div className="rounded-xl bg-secondary p-4 mb-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-muted-foreground">You Receive</span>
-            <TokenDropdown
-              token={toToken}
-              tokens={tokenList.length ? tokenList : []}
-              onSelect={setToToken}
-            />
+            <div className="relative">
+              <TokenDropdown
+                token={toToken}
+                tokens={tokenList.length ? tokenList : []}
+                onSelect={setToToken}
+              />
+            </div>
           </div>
           <div className="relative">
             {isLoading ? (

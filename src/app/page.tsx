@@ -2,16 +2,12 @@
 
 import { SwapModal } from '@/components/SwapModal'
 import { TokenInfo } from '@/components/TokenInfo'
-import { ArrowUpRight, BarChart3, History, Info, Settings, Star } from 'lucide-react'
+import { ArrowUpRight, History} from 'lucide-react'
 import { useRef } from 'react'
 import ConnectWalletButton from '@/components/ConnectWalletButton'
 
 export default function Home() {
   const mainContentRef = useRef<HTMLDivElement>(null)
-
-  const handleScrollDown = () => {
-    mainContentRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
 
   return (
     <main className="relative h-screen overflow-auto scroll-smooth">
@@ -21,6 +17,7 @@ export default function Home() {
         <header className="w-full px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-2">
+              {/* ts-ignore */}
               <img src="/images/logo.png" alt="Logo" className="w-8 h-8" />
               <h1 className="text-xl font-bold gradient-text">SWAP</h1>
             </div>
