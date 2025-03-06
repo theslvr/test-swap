@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { ArrowDownUp } from 'lucide-react';
+import { ArrowDownUp, Settings, ChevronDown, Info, RefreshCw, Sliders } from 'lucide-react';
 import { TokenDropdown, Token } from './TokenDropdown';
 
 // Define an interface for the Coin data from CoinGecko
@@ -18,15 +18,20 @@ export function SwapModal() {
   const [fromAmount, setFromAmount] = useState<string>('');
   const [toAmount, setToAmount] = useState<string>('');
   const [fromToken] = useState<Token>({
-    symbol: 'MONET',
-    name: 'MONET',
+    symbol: 'SOL',
+    name: 'Solana',
+    logo: 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png'
   });
   const [toToken, setToToken] = useState<Token>({
     symbol: 'USDC',
     name: 'USD Coin',
+    logo: 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png'
   });
 
   const [tokenList, setTokenList] = useState<Token[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [slippage, setSlippage] = useState<string>('0.5');
+  const [showSettings, setShowSettings] = useState<boolean>(false);
 
   useEffect(() => {
     fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false')
@@ -53,9 +58,14 @@ export function SwapModal() {
     setFromAmount(value);
     const numericValue = parseFloat(value);
     if (!isNaN(numericValue)) {
-      const randomFactor = 0.5 + Math.random();
-      const converted = numericValue * randomFactor;
-      setToAmount(converted.toFixed(2));
+      setIsLoading(true);
+      // Simulate API call delay
+      setTimeout(() => {
+        const randomFactor = 0.5 + Math.random();
+        const converted = numericValue * randomFactor;
+        setToAmount(converted.toFixed(6));
+        setIsLoading(false);
+      }, 500);
     } else {
       setToAmount('');
     }
@@ -70,89 +80,186 @@ export function SwapModal() {
   };
 
   return (
-    <Card className="w-[440px] bg-[#1C1C1C] border border-[#383838] backdrop-blur-md rounded-xl shadow-xl">
+    <Card className="w-full max-w-[510px] bg-card border border-border backdrop-blur-md rounded-xl shadow-xl">
       <CardContent className="p-4">
-        <div className="rounded-2xl bg-[#2C2C2C] p-4 mb-3">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <span className="text-lg font-semibold text-foreground">Swap</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <button 
+              onClick={() => setShowSettings(!showSettings)}
+              className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Settings size={18} />
+            </button>
+            <button className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
+              <RefreshCw size={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* Settings Panel */}
+        {showSettings && (
+          <div className="mb-4 p-3 bg-secondary rounded-xl">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium">Slippage Tolerance</span>
+              <div className="flex items-center space-x-2">
+                <button 
+                  className={`px-2 py-1 text-xs rounded-md ${slippage === '0.1' ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}`}
+                  onClick={() => setSlippage('0.1')}
+                >
+                  0.1%
+                </button>
+                <button 
+                  className={`px-2 py-1 text-xs rounded-md ${slippage === '0.5' ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}`}
+                  onClick={() => setSlippage('0.5')}
+                >
+                  0.5%
+                </button>
+                <button 
+                  className={`px-2 py-1 text-xs rounded-md ${slippage === '1.0' ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}`}
+                  onClick={() => setSlippage('1.0')}
+                >
+                  1.0%
+                </button>
+                <div className="relative">
+                  <Input 
+                    type="text" 
+                    value={slippage}
+                    onChange={(e) => setSlippage(e.target.value)}
+                    className="w-16 h-7 text-xs py-1 px-2 bg-muted text-foreground"
+                  />
+                  <span className="absolute right-2 top-1 text-xs text-muted-foreground">%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* From Token Section */}
+        <div className="rounded-xl bg-secondary p-4 mb-3">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-400">From</span>
+            <span className="text-sm text-muted-foreground">You Pay</span>
             <div className="flex items-center space-x-2">
               {fromToken.logo ? (
                 <img src={fromToken.logo} alt={fromToken.symbol} className="w-6 h-6 rounded-full" />
               ) : (
-                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-blue-500"></div>
+                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-primary to-purple-400"></div>
               )}
-              <span className="text-white font-semibold">{fromToken.symbol}</span>
+              <span className="text-foreground font-semibold">{fromToken.symbol}</span>
             </div>
           </div>
-          <Input
-            type="number"
-            placeholder="0.0"
-            value={fromAmount}
-            onChange={handleFromAmountChange}
-            className="bg-transparent text-white text-3xl font-semibold placeholder:text-gray-600 focus:outline-none border-b border-gray-600 pb-1"
-          />
+          <div className="no-arrows">
+            <Input
+              type="number"
+              placeholder="0.0"
+              value={fromAmount}
+              onChange={handleFromAmountChange}
+              style={{ WebkitAppearance: 'none', MozAppearance: 'textfield', appearance: 'none' }}
+              className="bg-transparent text-foreground text-3xl font-semibold placeholder:text-muted-foreground focus:outline-none border-none p-0 h-auto"
+            />
+          </div>
           <div className="flex justify-between items-center mt-2">
-            <span className="text-xs text-gray-500">Balance: 0.00</span>
+            <span className="text-xs text-muted-foreground">Balance: 0.00</span>
             <div className="flex space-x-2">
-              <button className="text-xs text-blue-400 hover:text-blue-300 bg-[#383838] px-2 py-1 rounded-full">50%</button>
-              <button className="text-xs text-blue-400 hover:text-blue-300 bg-[#383838] px-2 py-1 rounded-full">MAX</button>
+              <button className="text-xs text-primary hover:text-[var(--primary-hover)] bg-muted px-2 py-1 rounded-md transition-colors">50%</button>
+              <button className="text-xs text-primary hover:text-[var(--primary-hover)] bg-muted px-2 py-1 rounded-md transition-colors">MAX</button>
             </div>
           </div>
         </div>
 
+        {/* Switch Button */}
         <div className="flex justify-center -my-3 relative z-10">
           <Button
             variant="ghost"
             size="icon"
             onClick={handleSwitchTokens}
-            className="rounded-full bg-[#1C1C1C] border border-[#383838] hover:bg-[#2C2C2C] h-10 w-10 cursor-not-allowed"
+            className="rounded-full bg-card border border-border hover:bg-secondary h-10 w-10 cursor-not-allowed"
             disabled
           >
-            <ArrowDownUp className="h-5 w-5 text-blue-400" />
+            <ArrowDownUp className="h-5 w-5 text-primary" />
           </Button>
         </div>
 
-        <div className="rounded-2xl bg-[#2C2C2C] p-4 mb-4">
+        {/* To Token Section */}
+        <div className="rounded-xl bg-secondary p-4 mb-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-400">To</span>
+            <span className="text-sm text-muted-foreground">You Receive</span>
             <TokenDropdown
               token={toToken}
               tokens={tokenList.length ? tokenList : []}
               onSelect={setToToken}
             />
           </div>
-          <Input
-            type="number"
-            placeholder="0.0"
-            value={toAmount}
-            onChange={(e) => setToAmount(e.target.value)}
-            className="bg-transparent text-white text-3xl font-semibold placeholder:text-gray-600 focus:outline-none border-b border-gray-600 pb-1"
-          />
+          <div className="relative">
+            {isLoading ? (
+              <div className="h-12 flex items-center">
+                <div className="w-24 h-8 bg-muted rounded animate-pulse"></div>
+              </div>
+            ) : (
+              <Input
+                type="number"
+                placeholder="0.0"
+                value={toAmount}
+                readOnly
+                className="bg-transparent text-foreground text-3xl font-semibold placeholder:text-muted-foreground focus:outline-none border-none p-0 h-auto"
+              />
+            )}
+          </div>
           <div className="flex justify-between items-center mt-2">
-            <span className="text-xs text-gray-500">Balance: 0.00</span>
-            <span className="text-xs text-gray-500">≈ $0.00</span>
+            <span className="text-xs text-muted-foreground">Balance: 0.00</span>
+            <span className="text-xs text-muted-foreground">≈ $0.00</span>
           </div>
         </div>
 
-        <div className="rounded-2xl bg-[#2C2C2C] p-3 mb-4">
+        {/* Route Section */}
+        <div className="rounded-xl bg-secondary p-3 mb-4">
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-400">Route</span>
-            <span className="text-sm text-gray-400">Best price</span>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-muted-foreground">Route</span>
+              <Info size={14} className="text-muted-foreground" />
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-muted-foreground">Best price</span>
+              <Sliders size={14} className="text-muted-foreground" />
+            </div>
           </div>
           <div className="flex items-center space-x-2 mt-2">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-blue-500"></div>
-            <span className="text-gray-400">→</span>
-            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-green-400 to-blue-500"></div>
+            {fromToken.logo ? (
+              <img src={fromToken.logo} alt={fromToken.symbol} className="w-5 h-5 rounded-full" />
+            ) : (
+              <div className="w-5 h-5 rounded-full bg-gradient-to-r from-primary to-purple-400"></div>
+            )}
+            <span className="text-muted-foreground">→</span>
+            {toToken.logo ? (
+              <img src={toToken.logo} alt={toToken.symbol} className="w-5 h-5 rounded-full" />
+            ) : (
+              <div className="w-5 h-5 rounded-full bg-gradient-to-r from-green-400 to-blue-500"></div>
+            )}
           </div>
         </div>
 
+        {/* Swap Button */}
         <Button
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12 rounded-xl font-medium text-lg"
+          className="w-full !bg-[hsla(83,81%,73%,0.1)] border border-transparent text-[#c7f284] h-12 rounded-xl font-medium text-lg transition-colors hover:border hover:border-[#c7f284] cursor-pointer"
           onClick={handleSwap}
         >
-          Swap
+          Connect Wallet
         </Button>
       </CardContent>
+      <style jsx global>{`
+        .no-arrows input::-webkit-inner-spin-button,
+        .no-arrows input::-webkit-outer-spin-button {
+          display: none !important;
+          margin: 0;
+        }
+        .no-arrows input {
+          -moz-appearance: textfield !important;
+          appearance: none !important;
+        }
+      `}</style>
     </Card>
   );
 } 
