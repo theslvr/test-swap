@@ -3,6 +3,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { ArrowUpRight, TrendingUp, TrendingDown } from 'lucide-react';
+import Image from 'next/image';
 
 interface TokenInfoProps {
   symbol: string;
@@ -30,7 +31,7 @@ export function TokenInfo({
       <CardHeader className="flex flex-row items-center justify-between p-4 border-b border-border">
         <div className="flex items-center space-x-3">
           {logo ? (
-            <img src={logo} alt={symbol} className="w-8 h-8 rounded-full" />
+            <Image src={logo} alt={symbol} width={24} height={24} className="rounded-full" />
           ) : (
             <div className="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-purple-400"></div>
           )}

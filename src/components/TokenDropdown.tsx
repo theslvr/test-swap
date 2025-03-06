@@ -3,6 +3,7 @@ import { ChevronDown, Check, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import React, { useState } from 'react'
 import { Input } from './ui/input'
+import Image from 'next/image'
 
 export interface Token {
   symbol: string
@@ -34,7 +35,7 @@ export function TokenDropdown({ token, tokens, onSelect }: TokenDropdownProps) {
     >
       <Select.Trigger className={cn("flex items-center space-x-2 bg-muted hover:bg-accent px-3 py-1.5 rounded-lg transition-colors")}> 
         {token.logo ? (
-          <img src={token.logo} alt={token.symbol} className="w-5 h-5 rounded-full" />
+          <Image src={token.logo} alt={token.symbol} width={24} height={24} className="rounded-full" />
         ) : (
           <div className="w-5 h-5 rounded-full bg-gradient-to-r from-primary to-purple-400"></div>
         )}
@@ -67,7 +68,7 @@ export function TokenDropdown({ token, tokens, onSelect }: TokenDropdownProps) {
                 >
                   <div className="flex items-center flex-1">
                     {t.logo ? (
-                      <img src={t.logo} alt={t.symbol} className="w-6 h-6 rounded-full mr-3" />
+                      <Image src={t.logo} alt={t.symbol} width={24} height={24} className="rounded-full mr-3" />
                     ) : (
                       <div className="w-6 h-6 rounded-full bg-gradient-to-r from-primary to-purple-400 mr-3"></div>
                     )}

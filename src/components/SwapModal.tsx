@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { ArrowDownUp, Settings, ChevronDown, Info, RefreshCw, Sliders } from 'lucide-react';
+import { ArrowDownUp, RefreshCw, Sliders } from 'lucide-react';
 import { TokenDropdown, Token } from './TokenDropdown';
+import Image from 'next/image';
 
 // Define an interface for the Coin data from CoinGecko
 interface ICoinData {
@@ -31,7 +32,6 @@ export function SwapModal() {
   const [tokenList, setTokenList] = useState<Token[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [slippage, setSlippage] = useState<string>('0.5');
-  const [showSettings, setShowSettings] = useState<boolean>(false);
 
   useEffect(() => {
     fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false')
@@ -88,55 +88,11 @@ export function SwapModal() {
             <span className="text-lg font-semibold text-foreground">Swap</span>
           </div>
           <div className="flex items-center space-x-2">
-            <button 
-              onClick={() => setShowSettings(!showSettings)}
-              className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <Settings size={18} />
-            </button>
             <button className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
               <RefreshCw size={18} />
             </button>
           </div>
         </div>
-
-        {/* Settings Panel */}
-        {showSettings && (
-          <div className="mb-4 p-3 bg-secondary rounded-xl">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium">Slippage Tolerance</span>
-              <div className="flex items-center space-x-2">
-                <button 
-                  className={`px-2 py-1 text-xs rounded-md ${slippage === '0.1' ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}`}
-                  onClick={() => setSlippage('0.1')}
-                >
-                  0.1%
-                </button>
-                <button 
-                  className={`px-2 py-1 text-xs rounded-md ${slippage === '0.5' ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}`}
-                  onClick={() => setSlippage('0.5')}
-                >
-                  0.5%
-                </button>
-                <button 
-                  className={`px-2 py-1 text-xs rounded-md ${slippage === '1.0' ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}`}
-                  onClick={() => setSlippage('1.0')}
-                >
-                  1.0%
-                </button>
-                <div className="relative">
-                  <Input 
-                    type="text" 
-                    value={slippage}
-                    onChange={(e) => setSlippage(e.target.value)}
-                    className="w-16 h-7 text-xs py-1 px-2 bg-muted text-foreground"
-                  />
-                  <span className="absolute right-2 top-1 text-xs text-muted-foreground">%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* From Token Section */}
         <div className="rounded-xl bg-secondary p-4 mb-3">
@@ -144,7 +100,7 @@ export function SwapModal() {
             <span className="text-sm text-muted-foreground">You Pay</span>
             <div className="flex items-center space-x-2">
               {fromToken.logo ? (
-                <img src={fromToken.logo} alt={fromToken.symbol} className="w-6 h-6 rounded-full" />
+                <Image src={fromToken.logo} alt={fromToken.symbol} width={24} height={24} className="rounded-full" />
               ) : (
                 <div className="w-6 h-6 rounded-full bg-gradient-to-r from-primary to-purple-400"></div>
               )}
@@ -219,7 +175,6 @@ export function SwapModal() {
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <span className="text-sm text-muted-foreground">Route</span>
-              <Info size={14} className="text-muted-foreground" />
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-sm text-muted-foreground">Best price</span>
@@ -228,13 +183,13 @@ export function SwapModal() {
           </div>
           <div className="flex items-center space-x-2 mt-2">
             {fromToken.logo ? (
-              <img src={fromToken.logo} alt={fromToken.symbol} className="w-5 h-5 rounded-full" />
+              <Image src={fromToken.logo} alt={fromToken.symbol} width={20} height={20} className="rounded-full" />
             ) : (
               <div className="w-5 h-5 rounded-full bg-gradient-to-r from-primary to-purple-400"></div>
             )}
             <span className="text-muted-foreground">→</span>
             {toToken.logo ? (
-              <img src={toToken.logo} alt={toToken.symbol} className="w-5 h-5 rounded-full" />
+              <Image src={toToken.logo} alt={toToken.symbol} width={20} height={20} className="rounded-full" />
             ) : (
               <div className="w-5 h-5 rounded-full bg-gradient-to-r from-green-400 to-blue-500"></div>
             )}
