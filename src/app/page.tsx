@@ -5,6 +5,8 @@ import { TokenInfo } from '@/components/TokenInfo'
 import { ArrowUpRight, History} from 'lucide-react'
 import { useRef } from 'react'
 import ConnectWalletButton from '@/components/ConnectWalletButton'
+import Link from 'next/link'
+import Image from 'next/image'
 
 export default function Home() {
   const mainContentRef = useRef<HTMLDivElement>(null)
@@ -17,11 +19,14 @@ export default function Home() {
         <header className="w-full px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-2">
-              {/* ts-ignore */}
-              <img src="/images/logo.png" alt="Logo" className="w-8 h-8" />
+              <Image src="/images/logo.png" alt="Logo" width={32} height={32} className="w-8 h-8" priority />
               <h1 className="text-xl font-bold gradient-text">SWAP</h1>
             </div>
             <nav className="hidden md:flex items-center space-x-4">
+              <Link href="/charts" className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                Charts
+              </Link>
             </nav>
           </div>
           <div className="flex items-center space-x-2">
@@ -36,27 +41,15 @@ export default function Home() {
             <div className="w-full shadow-lg overflow-hidden flex gap-x-4">
               <div className="flex-1">
                 <TokenInfo 
-                  symbol="USDC"
-                  name="USDC"
-                  price="$0.9999"
-                  change24h={0}
-                  volume24h="$4.8B"
-                  marketCap="$9.62B"
-                  rank={7}
-                  logo="https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png"
+                  symbol="solana"
+                  name="solana"
                 />
               </div>
               <div className="flex-1">
                 <TokenInfo 
-                  symbol="SOL"
-                  name="Solana"
-                  price="$146.82"
-                  change24h={2.5}
-                  volume24h="$1.2B"
-                  marketCap="$64.3B"
-                  rank={6}
-                  logo="https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png"
-                />
+                  symbol="bitcoin"
+                  name="bitcoin"
+                  />
               </div>
             </div>
 

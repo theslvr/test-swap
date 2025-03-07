@@ -7,13 +7,75 @@ import { Input } from './ui/input';
 import { ArrowDownUp, RefreshCw, Sliders } from 'lucide-react';
 import { TokenDropdown, Token } from './TokenDropdown';
 import Image from 'next/image';
+import mockTokens from '../data/mockTokens.json';
 
-// Define an interface for the Coin data from CoinGecko
+// Интерфейсы
 interface ICoinData {
   symbol: string;
   name: string;
   image: string;
 }
+
+// Константы
+const FROM_TOKEN_FIXED_PRICE = 0.1; // Фиксированная цена для fromToken - 0.1$
+
+// Хелперы
+const getCoinId = (tokenName: string) => tokenName.toLowerCase().replace(/ /g, '-');
+
+// Расчет конвертации на основе фиксированной цены fromToken и реальной цены toToken
+const calculateConversion = async (
+  amount: number, 
+  toTokenName: string, 
+  setToAmount: (val: string) => void, 
+  setIsLoading: (val: boolean) => void
+) => {
+  try {
+    setIsLoading(true);
+    const toId = getCoinId(toTokenName);
+    
+    // Пытаемся получить данные из API
+    try {
+      const apiUrl = `https://api.coingecko.com/api/v3/simple/price?ids=${toId}&vs_currencies=usd`;
+      const response = await fetch(apiUrl);
+      
+      if (!response.ok) {
+        throw new Error('API response not OK');
+      }
+      
+      const priceData = await response.json();
+      
+      if (priceData[toId] && priceData[toId].usd) {
+        const toTokenUsdPrice = priceData[toId].usd;
+        // Конвертация: (количество * цена fromToken) / цена toToken
+        const convertedAmount = (amount * FROM_TOKEN_FIXED_PRICE) / toTokenUsdPrice;
+        setToAmount(convertedAmount.toFixed(6));
+      } else {
+        throw new Error('Price data unavailable for target token');
+      }
+    } catch (apiError) {
+      console.warn('API request failed, using mock data:', apiError);
+      
+      // Используем моковые данные при ошибке API
+      const mockToken = mockTokens.find(token => 
+        token.name.toLowerCase() === toTokenName.toLowerCase() || 
+        token.symbol.toLowerCase() === toTokenName.toLowerCase()
+      );
+      
+      if (mockToken && mockToken.price) {
+        const convertedAmount = (amount * FROM_TOKEN_FIXED_PRICE) / mockToken.price;
+        setToAmount(convertedAmount.toFixed(6));
+      } else {
+        console.error('Token not found in mock data:', toTokenName);
+        setToAmount('');
+      }
+    }
+  } catch (err) {
+    console.error('Error in conversion calculation:', err);
+    setToAmount('');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
 export function SwapModal() {
   const [fromAmount, setFromAmount] = useState<string>('');
@@ -32,42 +94,58 @@ export function SwapModal() {
   const [tokenList, setTokenList] = useState<Token[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  // Загрузка списка токенов
   useEffect(() => {
-    fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false')
-      .then((res) => res.json())
-      .then((data) => {
+    const loadTokens = async () => {
+      try {
+        const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch token list from API');
+        }
+        
+        const data = await response.json();
         const coinData = data as ICoinData[];
         const tokens: Token[] = coinData.map((coin) => ({
           symbol: coin.symbol.toUpperCase(),
           name: coin.name,
           logo: coin.image,
         }));
+        
         setTokenList(tokens);
-        if (tokens.length > 0) {
+        if (tokens.length > 0 && !toToken.symbol) {
           setToToken(tokens[0]);
         }
-      })
-      .catch((err) => {
-        console.error('Error fetching token list:', err);
-      });
+      } catch (error) {
+        console.warn('Using mock token data due to API error:', error);
+        
+        // Используем моковые данные при ошибке API
+        const mockTokensData: Token[] = mockTokens.map(token => ({
+          symbol: token.symbol,
+          name: token.name,
+          logo: token.logo
+        }));
+        
+        setTokenList(mockTokensData);
+        if (mockTokensData.length > 0 && !toToken.symbol) {
+          setToToken(mockTokensData[0]);
+        }
+      }
+    };
+    
+    loadTokens();
   }, []);
+
+  // Пересчет при изменении суммы или выбранного токена назначения
+  useEffect(() => {
+    if(fromAmount && toToken) {
+      calculateConversion(parseFloat(fromAmount), toToken.name, setToAmount, setIsLoading);
+    }
+  }, [fromAmount, toToken?.symbol]);
 
   const handleFromAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setFromAmount(value);
-    const numericValue = parseFloat(value);
-    if (!isNaN(numericValue)) {
-      setIsLoading(true);
-      // Simulate API call delay
-      setTimeout(() => {
-        const randomFactor = 0.5 + Math.random();
-        const converted = numericValue * randomFactor;
-        setToAmount(converted.toFixed(6));
-        setIsLoading(false);
-      }, 500);
-    } else {
-      setToAmount('');
-    }
   };
 
   const handleSwap = () => {
@@ -104,6 +182,7 @@ export function SwapModal() {
                 <div className="w-6 h-6 rounded-full bg-gradient-to-r from-primary to-purple-400"></div>
               )}
               <span className="text-foreground font-semibold">{fromToken.symbol}</span>
+              <span className="text-xs text-muted-foreground">(${FROM_TOKEN_FIXED_PRICE})</span>
             </div>
           </div>
           <div className="no-arrows">
@@ -167,7 +246,9 @@ export function SwapModal() {
           </div>
           <div className="flex justify-between items-center mt-2">
             <span className="text-xs text-muted-foreground">Balance: 0.00</span>
-            <span className="text-xs text-muted-foreground">≈ $0.00</span>
+            <span className="text-xs text-muted-foreground">
+              ≈ ${fromAmount && !isNaN(parseFloat(fromAmount)) ? (parseFloat(fromAmount) * FROM_TOKEN_FIXED_PRICE).toFixed(2) : '0.00'}
+            </span>
           </div>
         </div>
 

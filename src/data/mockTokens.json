@@ -1,0 +1,62 @@
+[
+  {
+    "symbol": "SOL",
+    "name": "Solana",
+    "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
+    "price": 100.25
+  },
+  {
+    "symbol": "USDC",
+    "name": "USD Coin",
+    "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png",
+    "price": 1.0
+  },
+  {
+    "symbol": "BTC",
+    "name": "Bitcoin",
+    "logo": "https://cryptologos.cc/logos/bitcoin-btc-logo.png",
+    "price": 50000.0
+  },
+  {
+    "symbol": "ETH",
+    "name": "Ethereum",
+    "logo": "https://cryptologos.cc/logos/ethereum-eth-logo.png",
+    "price": 3000.0
+  },
+  {
+    "symbol": "DOGE",
+    "name": "Dogecoin",
+    "logo": "https://cryptologos.cc/logos/dogecoin-doge-logo.png",
+    "price": 0.15
+  },
+  {
+    "symbol": "SHIB",
+    "name": "Shiba Inu",
+    "logo": "https://cryptologos.cc/logos/shiba-inu-shib-logo.png",
+    "price": 0.00002
+  },
+  {
+    "symbol": "MATIC",
+    "name": "Polygon",
+    "logo": "https://cryptologos.cc/logos/polygon-matic-logo.png",
+    "price": 0.8
+  },
+  {
+    "symbol": "LINK",
+    "name": "Chainlink",
+    "logo": "https://cryptologos.cc/logos/chainlink-link-logo.png",
+    "price": 14.5
+  },
+  {
+    "symbol": "DOT",
+    "name": "Polkadot",
+    "logo": "https://cryptologos.cc/logos/polkadot-new-dot-logo.png",
+    "price": 8.2
+  },
+  {
+    "symbol": "ADA",
+    "name": "Cardano",
+    "logo": "https://cryptologos.cc/logos/cardano-ada-logo.png",
+    "price": 0.45
+  }
+] 
